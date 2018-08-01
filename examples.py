@@ -54,7 +54,7 @@ import tensorflow as tf
 # 创建一个变量，  初始化为标量 0
 x = tf.Variable(0, name="counter")
 
-# 创建一个operation, 其作用是使state 增加 1
+# 创建一个operation, 其作用是使x 增加 1
 one = tf.constant(1)
 new_value = tf.add(x,one)
 
@@ -76,6 +76,30 @@ with tf.Session() as sess:
         print(sess.run(x))
 
 # example 4 #########################################################
-
+import tensorflow as tf
+ 
+# Fetch
+# 为了取回操作的输出内容, 可以在使用 Session 对象的 run() 调用 执行图时, 传入一些 tensor, 这些 tensor 会帮助你取回结果. 
+# 如取回多个 tensor:
+input1 = tf.constant(3.0)
+input2 = tf.constant(2.0)
+input3 = tf.constant(5.0)
+intermed = tf.add(input2, input3)
+mul = tf.multiply(input1, intermed)
+with tf.Session() as sess:
+  result = sess.run([mul, intermed])
+  print(result)
 
 # example 5 #########################################################
+
+
+# example 6 #########################################################
+
+
+# example 7 #########################################################
+
+
+# example 8 #########################################################
+
+
+# example 9 #########################################################
