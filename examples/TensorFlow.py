@@ -105,7 +105,65 @@ with tf.Session() as sess:
   print(sess.run([output], feed_dict={input1:[7.], input2:[2.]}))
 
 # example 6 #########################################################
+#概率学中的逆概率
+#什么是逆概率
+#我们肯定知道正概率，举个例子就是，箱子里有5个黑球5个白球，那你随机拿到黑球和白球的概率都是50%，那现在我不知道箱子里有多少个黑球白球，那我通过不断的拿球应该如何确定箱子里有多少个黑球白球呢，这就是出名的逆概率
+#其实机器学习很多时候也就是逆概率的问题，我有大量现实例子的情况下，让机器从这些例子中找到共同的特征，例如给一万张猫的图片给机器学习，然后找到共同的特征（两只耳朵，四只脚，有胡须，有毛，有尾巴等特征）
+#根据逆概率的概念我们再举个其他场景
 
+#y=Ax+B（A、B是常量），这是一条非常简单的数学方程式，有小学基础的人应该都知道。
+#我现在有很多的x和y值，所以问题就是如何通过这些x和y值来得到A和B的值？
+#接下来解决这个问题
+
+import numpy as np
+import tensorflow as tf
+
+##构造数据
+x_data=np.random.rand(100).astype(np.float32) #随机生成100个类型为float32的值
+y_data=x_data*0.1+0.3  #定义方程式y=x_data*A+B
+print(y_data)
+
+##建立TensorFlow神经计算结构
+weight=tf.Variable(tf.random_uniform([1],-1.0,1.0)) 
+biases=tf.Variable(tf.zeros([1]))     
+y=weight*x_data+biases
+print(y)
+
+#判断与正确值的差距
+#tensorflow中有一类在tensor的某一维度上求值的函数。如：
+#求最大值tf.reduce_max(input_tensor, reduction_indices=None, keep_dims=False, name=None)
+#求平均值tf.reduce_mean(input_tensor, reduction_indices=None, keep_dims=False, name=None)
+#参数1--input_tensor:待求值的tensor。
+#参数2--reduction_indices:在哪一维上求解。
+loss=tf.reduce_mean(tf.square(y-y_data))
+
+#根据差距进行反向传播修正参数
+#class tf.train.GradientDescentOptimizer
+#这个类是实现梯度下降算法的优化器。(结合理论可以看到，这个构造函数需要的一个学习率就行了)
+#__init__(learning_rate, use_locking=False,name=’GradientDescent’)
+#作用：创建一个梯度下降优化器对象 
+#参数： 
+#learning_rate: A Tensor or a floating point value. 要使用的学习率 
+#use_locking: 要是True的话，就对于更新操作（update operations.）使用锁 
+#name: 名字，可选，默认是”GradientDescent”.
+optimizer=tf.train.GradientDescentOptimizer(0.5)
+
+#建立训练器
+train=optimizer.minimize(loss)
+
+#初始化TensorFlow训练结构
+init=tf.global_variables_initializer() 
+
+#建立TensorFlow训练会话
+sess=tf.Session()
+
+#将训练结构装载到会话中
+sess.run(init)
+
+for step in range(400): #循环训练400次
+     sess.run(train)  #使用训练器根据训练结构进行训练
+     if  step%20==0:  #每20次打印一次训练结果
+        print(step,sess.run(weight),sess.run(biases)) #训练次数，A值，B值
 
 # example 7 #########################################################
 
