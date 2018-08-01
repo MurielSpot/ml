@@ -48,7 +48,32 @@ sess.close()
 #      print result
 
 # example 3 #########################################################
+import tensorflow as tf
+ 
+# 变量 Variable
+# 创建一个变量，  初始化为标量 0
+x = tf.Variable(0, name="counter")
 
+# 创建一个operation, 其作用是使state 增加 1
+one = tf.constant(1)
+new_value = tf.add(x,one)
+
+# tf.assign(A, new_number): 把A的值变为new_number
+update = tf.assign(x, new_value)
+
+# 启动图后, 变量必须先经过`初始化` (init) op 初始化,
+# 首先必须增加一个`初始化` op 到图中.
+# init_op = tf.initialize_all_variables()已经不推荐使用了（2018.8）
+init_op = tf.global_variables_initializer()
+
+with tf.Session() as sess:
+    # 运行 init_op
+    sess.run(init_op)
+    # 打印初始状态
+    print(sess.run(x))
+    for _ in range(3):
+        sess.run(update)
+        print(sess.run(x))
 
 # example 4 #########################################################
 
