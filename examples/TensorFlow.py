@@ -201,6 +201,116 @@ for循环里的matrix1在第一次被改变之后，输出12，再次运行sess�
 '''
 
 # example 8 #########################################################
+# 拟合模型与实际数据，并将实际数据和模型的曲线画出来。
+
+import tensorflow as tf
+import numpy as np
+
+# 可视化
+import matplotlib.pyplot as plt
+
+def add_layer(inputs,in_size,out_size,activation_func=None):
+    # in_size行,out_size列。
+    Weights=tf.Variable(tf.random_normal([in_size,out_size]))
+    # 设置biases全为0.1。
+    biases=tf.Variable(tf.zeros([1,out_size])+0.1)
+
+    Wx_plus_b=tf.matmul(inputs,Weights)+biases
+    if activation_func is None:
+        outputs=Wx_plus_b
+    else:
+        outputs=activation_func(Wx_plus_b)
+    return outputs
+
+'''
+numpy.linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None)
+在指定的间隔内返回均匀间隔的数字。
+返回num均匀分布的样本，在[start, stop]。
+'''
+x_data=np.linspace(-1,1,300)[:,np.newaxis]
+print("未使用[:,np.newaxis]时，np.linspace(-1,1,300):",np.linspace(-1,1,300))
+print("使用[:,np.newaxis]后：",x_data)
+
+'''
+numpy.random.normal(loc=0.0, scale=1.0, size=None)
+
+参数的意义为：
+loc：float
+    此概率分布的均值（对应着整个分布的中心centre）
+scale：float
+    此概率分布的标准差（对应于分布的宽度，scale越大越矮胖，scale越小，越瘦高）
+size：int or tuple of ints
+    输出的shape，默认为None，只输出一个值
+'''
+# 使用noise让y对应的点不要完全符合x的平方的规律，即让输出的点更随机。
+noise=np.random.normal(0,0.05,x_data.shape)
+print("np.random.normal(0,0.05,x_data.shape)输出为：",noise)
+
+y_data=np.square(x_data)-0.5+noise
+
+xs=tf.placeholder(tf.float32,[None,1])
+ys=tf.placeholder(tf.float32,[None,1])
+
+#第一层隐藏层
+l1=add_layer(xs,1,10,activation_func=tf.nn.relu)
+
+#输出层
+prediction=add_layer(l1,10,1,activation_func=None)
+
+'''
+#reduce_sum应该理解为压缩求和，用于降维
+# 'x' is [[1, 1, 1]
+#         [1, 1, 1]]
+#求和
+tf.reduce_sum(x) ==> 6
+#按列求和
+tf.reduce_sum(x, 0) ==> [2, 2, 2]
+#按行求和
+tf.reduce_sum(x, 1) ==> [3, 3]
+#按照行的维度求和
+tf.reduce_sum(x, 1, keep_dims=True) ==> [[3], [3]]
+#行列求和
+tf.reduce_sum(x, [0, 1]) ==> 6
+
+A = np.array([[1,2], [3,4]])
+with tf.Session() as sess:
+	print sess.run(tf.reduce_mean(A))
+	print sess.run(tf.reduce_mean(A, axis=0))
+	print sess.run(tf.reduce_mean(A, axis=1))
+输出：
+2 #整体的平均值
+[2 3] #按列求得平均
+[1 3] #按照行求得平均
+'''
+loss=tf.reduce_mean(tf.reduce_sum(tf.square(ys-prediction),reduction_indices=[1]))
+train_step=tf.train.GradientDescentOptimizer(0.1).minimize(loss)
+init=tf.global_variables_initializer()
+
+with tf.Session() as sess:
+  sess.run(init)
+
+  # 画画
+  fig=plt.figure()
+  ax=fig.add_subplot(1,1,1)
+  ax.scatter(x_data,y_data)
+  plt.ion()#让图像绘制不停止，画完一个继续画下一个。
+  plt.show()
+
+  for step in range(1000):
+    # 如果把一部分x_data传给xs，则可以实现小批量学习。
+    sess.run(train_step,feed_dict={xs:x_data,ys:y_data})
+    if step%50==0:
+        #print(sess.run(loss,feed_dict={xs:x_data,ys:y_data}))
+
+        try:
+            #要把之前画的线抹除之后，再画下一条。
+            ax.lines.remove(lines[0])
+        except Exception:
+            pass
+        prediction_value=sess.run(prediction,feed_dict={xs:x_data,ys:y_data})
+        # r-表示红色的线，lw表示宽度为5.
+        lines=ax.plot(x_data,prediction_value,'r-',lw=5)
+        plt.pause(0.1)
 
 
 # example 9 #########################################################
