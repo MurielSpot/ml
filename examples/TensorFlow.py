@@ -53,6 +53,8 @@ import tensorflow as tf
 # 变量 Variable
 # 创建一个变量，  初始化为标量 0
 x = tf.Variable(0, name="counter")
+# 打印变量名和值
+print(x.name)
 
 # 创建一个operation, 其作用是使x 增加 1
 one = tf.constant(1)
@@ -92,17 +94,20 @@ with tf.Session() as sess:
 
 # example 5 #########################################################
 import tensorflow as tf
- 
+
 # Feed
 # feed 机制可以临时替代图中的任意操作中的 tensor 可以对图中任何操作提交补丁, 直接插入一个 tensor.
 # feed 使用一个 tensor 值临时替换一个操作的输出结果. 
 # 你可以提供 feed 数据作为 run() 调用的参数. feed 只在调用它的方法内有效, 方法结束, feed 就会消失. 
 # 最常见的用例是将某些特殊的操作指定为 "feed" 操作, 标记的方法是使用 tf.placeholder() 为这些操作创建占位符.
+# placeholder需要指明数据类型，一般tf常用float32.
 input1 = tf.placeholder(tf.float32)
 input2 = tf.placeholder(tf.float32)
 output = tf.multiply(input1, input2)
 with tf.Session() as sess:
   print(sess.run([output], feed_dict={input1:[7.], input2:[2.]}))
+  print(sess.run(output, feed_dict={input1:[7.7], input2:[2.]}))
+  # 上面两句分别输出：[array([14.], dtype=float32)]和[15.4]。
 
 # example 6 #########################################################
 #概率学中的逆概率
@@ -165,10 +170,55 @@ for step in range(400): #循环训练400次
      if  step%20==0:  #每20次打印一次训练结果
         print(step,sess.run(weight),sess.run(biases)) #训练次数，A值，B值
 
-# example 7 #########################################################
+sess.close()
 
+# example 7 #########################################################
+import tensorflow as tf
+
+matrix1=tf.constant([[3,3]])
+matrix2=tf.constant([[2],
+                     [2]])
+
+#matrix multiply,numpy中矩阵乘法为 np.dot(matrix1,matrix2)
+product=tf.matmul(matrix1,matrix2)
+
+sess=tf.Session()
+for i in range(5):
+    matrix1=sess.run(product)
+    print(matrix1)
+
+sess.close()
+
+'''
+注意输出的结果：
+[[12]]
+[[12]]
+[[12]]
+[[12]]
+[[12]]
+
+for循环里的matrix1在第一次被改变之后，输出12，再次运行sess，结果还是12.
+'''
 
 # example 8 #########################################################
 
 
 # example 9 #########################################################
+
+
+# example 10 #########################################################
+
+
+# example 11 #########################################################
+
+
+# example 12 #########################################################
+
+# example 13 #########################################################
+
+# example 14 #########################################################
+
+# example 15 #########################################################
+
+# example 16 #########################################################
+
