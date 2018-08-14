@@ -435,6 +435,60 @@ with tf.Session() as sess:
             writer.add_summary(result,i)
 
 # example 11 #########################################################
+# 分类classification.
+
+import tensorflow as tf
+from tensorflow.examples.tutorials.mnist import input_data
+
+# number 1 to 10 data
+# 如果电脑上没有这个数据包,这句会帮你从网上下载下来.
+# './MNIST_data'可以改成数据在电脑上的完整路径.
+mnist=input_data.read_data_sets('./MNIST_data',one_hot=True)
+
+def add_layer(inputs,in_size,out_size,activation_function=None):
+    Weights=tf.Variable(tf.random_normal([in_size,out_size]))
+    biases=tf.Variable(tf.zeros([1,out_size])+0.1)
+    Wx_plus_b=tf.matmul(inputs,Weights)+biases
+    if activation_function is None:
+        outputs=Wx_plus_b
+    else:
+        outputs=activation_function(Wx_plus_b,)
+    return outputs
+
+def compute_accuracy(v_xs,v_ys):
+    global prediction#设置prediction为全局变量.
+
+    #将v_xs传到prediction里面,生成预测值.
+    y_pre=sess.run(prediction,feed_dict={xs:v_xs})
+    #预测的值与实际值是否相同.
+    correct_prediction=tf.equal(tf.argmax(y_pre,1),tf.argmax(v_ys,1))
+    #计算准确率.
+    accuracy=tf.reduce_mean(tf.cast(correct_prediction,tf.float32))
+    result=sess.run(accuracy,feed_dict={xs:v_xs,ys:v_ys})
+    return result
+
+# define placeholder for inputs to network
+# [None,784]不规定有多少个sample,但规定每个sample的大小是784.
+xs=tf.placeholder(tf.float32,[None,784])
+# 每个sample(此代码里表示输出)大小为10.
+ys=tf.placeholder(tf.float32,[None,10])
+
+# add output layer
+prediction=add_layer(xs,784,10,activation_function=tf.nn.softmax)
+
+# the error between prediction and real data.
+cross_entropy=tf.reduce_mean(-tf.reduce_sum(ys*tf.log(prediction),reduction_indices=[1]))
+train_step=tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
+
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    for i in range(100):
+        #设置训练时每一批次大小为100.
+        batch_xs,batch_ys=mnist.train.next_batch(100)
+        sess.run(train_step,feed_dict={xs:batch_xs,ys:batch_ys})
+        if i%5==0:
+            print(compute_accuracy(mnist.test.images,mnist.test.labels))
+
 
 
 # example 12 #########################################################
