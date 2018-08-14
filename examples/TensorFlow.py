@@ -368,18 +368,96 @@ tensorboard --logdir=文件所在文件夹路径
 '''
 
 # example 10 #########################################################
+# 可视化,使用tensorboard.
 
+import tensorflow as tf
+import numpy as np
+
+def add_layer(inputs,in_size,out_size,n_layer,activation_func=None):
+    layer_name='layer%s'%n_layer
+    with tf.name_scope(layer_name+'_scope'):
+        with tf.name_scope('weights_scope'):
+            # in_size行,out_size列。
+            Weights=tf.Variable(tf.random_normal([in_size,out_size]))
+            #tf.histogram_summary()改为：tf.summary.histogram()
+            # 了解weights变量的变化情况.
+            tf.summary.histogram('/Weights',Weights)
+        with tf.name_scope('biases_scope'):
+            # 设置biases全为0.1。
+            biases=tf.Variable(tf.zeros([1,out_size])+0.1)
+            tf.summary.histogram('/biases',biases)
+        with tf.name_scope('Wx_plus_b_scope'):
+            Wx_plus_b=tf.matmul(inputs,Weights)+biases
+        
+        #激活函数不明确给它命名,它也会默认有相应的名字,所以可以不用tf.name_scope.
+        if activation_func is None:
+            outputs=Wx_plus_b
+        else:
+            outputs=activation_func(Wx_plus_b)
+        tf.summary.histogram('/outputs',outputs)
+        return outputs
+
+# make up some real data.
+x_data=np.linspace(-1,1,300)[:,np.newaxis]
+noise=np.random.normal(0,0.05,x_data.shape)
+y_data=np.square(x_data)-0.5+noise
+
+with tf.name_scope('inputs_scope'):
+    xs=tf.placeholder(tf.float32,[None,1],name='x_input')
+    ys=tf.placeholder(tf.float32,[None,1],name='y_input')
+
+#第一层隐藏层,注意前面定义函数时增加了n_layer参数.
+l1=add_layer(xs,1,10,n_layer=1,activation_func=tf.nn.relu)
+
+#输出层
+prediction=add_layer(l1,10,1,n_layer=2,activation_func=None)
+
+with tf.name_scope('loss_scope'):
+    loss=tf.reduce_mean(tf.reduce_sum(tf.square(ys-prediction),reduction_indices=[1]))
+    #与tf.summary.histogram()不同点在于,它不会在tensorboard的histogram里显示,而是在events里显示.
+    tf.summary.scalar('loss',loss)
+with tf.name_scope('train_step_scope'):
+    train_step=tf.train.GradientDescentOptimizer(0.1).minimize(loss)
+
+init=tf.global_variables_initializer()
+
+with tf.Session() as sess:
+    #将前面的summary都合并起来.
+    merged=tf.summary.merge_all()
+    writer=tf.summary.FileWriter("logs/",sess.graph)
+    sess.run(init)
+
+    #训练100次.
+    for i in range(100):
+        sess.run(train_step,feed_dict={xs:x_data,ys:y_data})
+        if i%5==0:
+            result=sess.run(merged,feed_dict={xs:x_data,ys:y_data})
+            writer.add_summary(result,i)
 
 # example 11 #########################################################
 
 
 # example 12 #########################################################
 
+
 # example 13 #########################################################
+
 
 # example 14 #########################################################
 
+
 # example 15 #########################################################
 
+
 # example 16 #########################################################
+
+
+# example 17 #########################################################
+
+
+# example 18 #########################################################
+
+
+# example 19 #########################################################
+
 
