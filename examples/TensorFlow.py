@@ -314,7 +314,58 @@ with tf.Session() as sess:
 
 
 # example 9 #########################################################
+# 可视化,使用tensorboard.
 
+import tensorflow as tf
+import numpy as np
+
+def add_layer(inputs,in_size,out_size,activation_func=None):
+    with tf.name_scope('layer'):
+        with tf.name_scope('weights'):
+            # in_size行,out_size列。
+            Weights=tf.Variable(tf.random_normal([in_size,out_size]))
+        with tf.name_scope('biases'):
+            # 设置biases全为0.1。
+            biases=tf.Variable(tf.zeros([1,out_size])+0.1)
+        with tf.name_scope('Wx_plus_b'):
+            Wx_plus_b=tf.matmul(inputs,Weights)+biases
+        
+        #激活函数不明确给它命名,它也会默认有相应的名字,所以可以不用tf.name_scope.
+        if activation_func is None:
+            outputs=Wx_plus_b
+        else:
+            outputs=activation_func(Wx_plus_b)
+        return outputs
+
+with tf.name_scope('inputs'):
+    xs=tf.placeholder(tf.float32,[None,1],name='x_input')
+    ys=tf.placeholder(tf.float32,[None,1],name='y_input')
+
+#第一层隐藏层
+l1=add_layer(xs,1,10,activation_func=tf.nn.relu)
+
+#输出层
+prediction=add_layer(l1,10,1,activation_func=None)
+
+with tf.name_scope('loss'):
+    loss=tf.reduce_mean(tf.reduce_sum(tf.square(ys-prediction),reduction_indices=[1]))
+with tf.name_scope('train_step'):
+    train_step=tf.train.GradientDescentOptimizer(0.1).minimize(loss)
+
+init=tf.global_variables_initializer()
+
+with tf.Session() as sess:
+    #将整个框架,写入文件,然后再用浏览器读这个文件,才能看到整个框架结构.
+    #tensorflow 新版取消了tf.train.SummaryWriter()，换成使用tf.summary.FileWriter()
+    writer=tf.summary.FileWriter("logs/",sess.graph)
+    sess.run(init)
+
+'''
+文件存到文件夹里之后.
+在命令行里输入:
+tensorboard --logdir=文件所在文件夹路径
+打开tensorboard之后,命令行里会提示可以通过哪个网址来查看整个神经网络框架的图像.
+'''
 
 # example 10 #########################################################
 
