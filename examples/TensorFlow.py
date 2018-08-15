@@ -686,9 +686,23 @@ with tf.Session() as sess:
         print(compute_accuracy(mnist.test.images,mnist.test.labels))
 
 # example 15 #########################################################
+# 将模型保存到文件。
+import tensorflow as tf
 
+# save to file
+W=tf.Variable([[1,2,3],[4,5,6]],dtype=tf.float32,name='weights')
+b=tf.Variable([[1,2,3]],dtype=tf.float32,name='biases')
+
+init=tf.global_variables_initializer()
+
+saver=tf.train.Saver()
+
+with tf.Session() as sess:
+    sess.run(init)
+    save_path=saver.save(sess,"./save_net.ckpt")
 
 # example 16 #########################################################
+# 接上面的例子，从文件中读取模型。
 
 
 # example 17 #########################################################
