@@ -703,7 +703,20 @@ with tf.Session() as sess:
 
 # example 16 #########################################################
 # 接上面的例子，从文件中读取模型。
+# 注意，目前TensorFlow只能保存参数，不能保存神经网络框架，如果从文件中读取参数的时候需要重新定义框架。
+import tensorflow as tf
+import numpy as np
 
+# remember to define the same dtype and shape when restore.
+W=tf.Variable(np.arange(6).reshape((2,3)),dtype=tf.float32,name="weights")
+b=tf.Variable(np.arange(3).reshape((1,3)),dtype=tf.float32,name="biases")
+
+# not need init step
+saver=tf.train.Saver()
+with tf.Session() as sess:
+    saver.restore(sess,"./save_net.ckpt")
+    print("weights:",sess.run(W))
+    print("biases:",sess.run(b))
 
 # example 17 #########################################################
 
