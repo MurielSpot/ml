@@ -719,11 +719,48 @@ with tf.Session() as sess:
     print("biases:",sess.run(b))
 
 # example 17 #########################################################
+# 自加1程序：
+import tensorflow as tf
 
+x=tf.Variable(0,tf.int32)
+increment=tf.assign(x,x+1)
+
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    for i in range(10):
+        print(sess.run(increment))#输出1到10.
 
 # example 18 #########################################################
+# fetch，可以用列表让sess.run一次运行多个op。
+import tensorflow as tf
 
+x=tf.Variable(0,tf.int32)
+y=tf.constant([1,1],tf.int32)
+
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer()) 
+    print(sess.run([x,y]))#用列表可以一次运行多个op。
+    # [0, array([1, 1])]
 
 # example 19 #########################################################
 
 
+# example 20 #########################################################
+
+
+# example 21 #########################################################
+
+
+# example 22 #########################################################
+
+
+# example 23 #########################################################
+
+
+# example 24 #########################################################
+
+
+# example 25 #########################################################
+
+
+# example 26 #########################################################
