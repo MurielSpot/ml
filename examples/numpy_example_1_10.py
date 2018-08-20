@@ -1,5 +1,12 @@
 # 每个example可以单独运行。
 
+# example 1-10
+# 1：查看版本，配置；创建数组；数组大小，数组形状。
+# 2：创建数组的函数：np.arange(0,1,0.1),np.linspace(0, 1, 3),np.logspace(0, 2, 20),np.fromstring(s, dtype=np.int8)。
+# 3：存取元素。
+# 4：多维数组。
+# 5：
+
 # example 1 #############################################################
 import numpy as np
 
