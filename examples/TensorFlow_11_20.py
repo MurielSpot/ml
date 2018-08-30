@@ -1,3 +1,16 @@
+'''
+11:分类。
+12:
+13:
+14:
+15:
+16:
+17:
+18:
+19:一层隐藏层的神经网络（识别手写数字）。
+20:
+'''
+
 # example 11 #########################################################
 # 分类classification.
 
@@ -307,7 +320,58 @@ with tf.Session() as sess:
     # [0, array([1, 1])]
 
 # example 19 #########################################################
+# 识别手写数字。以前写过类似代码，这里的代码基本一点新内容都没有，存着玩吧。
+import tensorflow as tf
+from tensorflow.examples.tutorials.mnist import input_data
 
+datasets_path=自己加
+
+# 载入数据集
+mnist=input_data.read_data_sets(datasets_path,one_hot=True)
+
+# 每个批次大小
+batch_size=100
+
+# 计算一个有多少个批次
+n_batch=mnist.train.num_examples//batch_size
+
+# 占位符
+x=tf.placeholder(tf.float32,[None,784])
+y=tf.placeholder(tf.float32,[None,10])
+
+# 创建一个简单的神经网络
+W=tf.Variable(tf.zeros([784,10]))
+b=tf.Variable(tf.zeros([10]))
+prediction=tf.nn.softmax(tf.matmul(x,W))+b
+
+# 二次代价函数
+loss=tf.reduce_mean(tf.square(y-prediction))
+
+# 梯度下降法
+train_step=tf.train.GradientDescentOptimizer(0.5).minimize(loss)
+#用下面的optimizer反而准确率会下降。
+#train_step=tf.train.AdamOptimizer(0.3).minimize(loss)
+
+# 初始化变量
+init=tf.global_variables_initializer()
+
+# 判断是否正确预测
+correct_prediction=tf.equal(tf.argmax(y,1),tf.argmax(prediction,1))
+
+# 求准确率
+accuracy=tf.reduce_mean(tf.cast(correct_prediction,tf.float32))
+
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+
+with tf.Session() as sess:
+    sess.run(init)
+    for epoch in range(21):
+        for batch in range(n_batch):
+            batch_xs,batch_ys=mnist.train.next_batch(batch_size)#分别保存了图片和对应标签。
+            sess.run(train_step,feed_dict={x:batch_xs,y:batch_ys})
+            
+        print("epoch [%d]"%epoch," accuracy:",sess.run(accuracy,feed_dict={x:mnist.test.images,y:mnist.test.labels}))
 
 # example 20 #########################################################
 
