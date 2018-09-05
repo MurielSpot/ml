@@ -374,10 +374,11 @@ with tf.Session() as sess:
         print("epoch [%d]"%epoch," accuracy:",sess.run(accuracy,feed_dict={x:mnist.test.images,y:mnist.test.labels}))
 
 # example 20 #########################################################
+# 使用lstm rnn进行手写数字分类。
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 
-datasets_path=r"./ml_datasets/MNIST_data/"
+datasets_path=r"./ml_datasets/MNIST_data/"#需要自己确定路径。
 mnist=input_data.read_data_sets(datasets_path,one_hot=True)
 
 # hyperparameters
