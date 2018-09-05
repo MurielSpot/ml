@@ -1,12 +1,12 @@
 '''
 11:分类。
-12:
-13:
-14:
-15:
-16:
-17:
-18:
+12:训练集，测试集。
+13:dropout。
+14:cnn。
+15:将模型保存到文件。
+16:从文件中读取模型。
+17:自加1程序。
+18:fetch。
 19:一层隐藏层的神经网络（识别手写数字）。
 20:
 '''
@@ -185,7 +185,7 @@ with tf.Session() as sess:
             test_writer.add_summary(test_result,i)
 
 # example 14 #########################################################
-# cnn.没跑出来，一方面因为资源不足，另一方面，好像最后一行print精确度的函数也报错了。
+# cnn.
 
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
