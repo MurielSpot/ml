@@ -205,6 +205,27 @@ def decoder(x):
     decoder函数开头的layers=[]，layers.append(x)应该与encoder函数里的return layers[-1]搭配。
     或者decoder函数开头的layers=[]，layers.append(x)改为layers=x,此时应该与encoder函数里的return layers搭配。
     除此以外的搭配方式都会报错ValueError: Shape must be rank 2 but is rank 1 for 'decoder_layer1_18/MatMul' (op: 'MatMul') with input shapes: [4], [4,8].
+    
+    出错原因举个例子：
+    def a():
+    list=[(2,3),(2,3)]
+    return list[-1]
+
+    def b(x):
+        list=x
+        print(list[-1])
+
+        list=[]
+        list.append(x)
+        print(list[-1])
+
+    b(a())
+    
+    结果：
+    3
+    (2, 3)
+    
+    所以自编码器的程序中，如果encoder返回的是最后一个tensor，直接用x=tensor，再取x[-1]得到的将是tensor里的一个部分，而x=[tensor]，再取x[-1]得到的才是整个tensor。
     '''
     layers=[]
     layers.append(x)
