@@ -1,7 +1,7 @@
 '''
 21:lstm rnn.
 22:自编码器，autoencoder。
-23:
+23:name_scope,tf.get_variable,tf.Variable的用法.
 24:
 25:
 '''
@@ -310,7 +310,33 @@ epoch [4]  loss: 0.09041786
 ''' 
 
 # example 23 #########################################################
+import tensorflow as tf
 
+with tf.name_scope("a_name_scope"):
+    initializer=tf.constant_initializer(value=1)
+    # 使用get_variable建立变量打印的时候，不会包含scope名。
+    var1=tf.get_variable(name="var1",shape=[1],dtype=tf.float32)
+    # 使用variable建立变量时，打印时会包含scope名。
+    var2=tf.Variable(name="var2",initial_value=[2],dtype=tf.float32)
+    # 使用variable建立变量时，虽然name="var2"，但是打印出来的名字会在var2后面添加序号。
+    var21=tf.Variable(name="var2",initial_value=[2.1],dtype=tf.float32)
+    var22=tf.Variable(name="var2",initial_value=[2.2],dtype=tf.float32)
+
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+
+    print(var1.name,sess.run(var1))
+    print(var2.name,sess.run(var2))
+    print(var21.name,sess.run(var21))
+    print(var22.name,sess.run(var22))
+    
+'''
+结果：
+var1:0 [-1.3536651]
+a_name_scope/var2:0 [2.]
+a_name_scope/var2_1:0 [2.1]
+a_name_scope/var2_2:0 [2.2]
+'''
 
 # example 24 #########################################################
 
