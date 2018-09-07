@@ -362,6 +362,14 @@ with tf.Session() as sess:
     print(var4.name,sess.run(var4))
     print(var4_reuse.name,sess.run(var4_reuse))
 
+'''
+结果：
+a_variable_scope/var3:0 [3.]
+a_variable_scope/var3:0 [3.]
+a_variable_scope_1/var4:0 [4.]
+a_variable_scope_1/var4_1:0 [4.1]
+'''
+
 # example 25 #########################################################
 
 
