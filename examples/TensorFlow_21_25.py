@@ -1,6 +1,6 @@
 '''
 21:lstm rnn.
-22:
+22:自编码器，autoencoder。
 23:
 24:
 25:
@@ -142,7 +142,140 @@ def main():
 main()
 
 # example 22 #########################################################
+# 自编码器，autoencoder。
+import tensorflow as tf
+import numpy as np
+import matplotlib.pyplot as plt
 
+from tensorflow.examples.tutorials.mnist import input_data
+
+data_path=r"./ml_datasets/MNIST_data/"
+mnist=input_data.read_data_sets(data_path,one_hot=False)
+
+learning_rate=0.01
+training_epoches=5
+batch_size=256
+display_step=1#每隔多少个epoch显示一次结果。
+example_to_show=10
+
+net_input=784
+
+x=tf.placeholder(tf.float32,[None,net_input])
+
+def init_weights(in_size,out_size):
+    return tf.Variable(tf.random_normal([in_size,out_size],mean=0.0,stddev=1.0))
+
+def init_biases(size):
+    return  tf.Variable(tf.random_normal([size]))
+
+hidden_neuron_num={
+    "layer1":256,
+    "layer2":128,
+    "layer3":64,
+    "layer4":32,
+    "layer5":16,
+    "layer6":8,
+    "layer7":4
+    }
+def encoder(x):
+    layers=[]
+
+    # first.
+    with tf.name_scope("encoder_layer1"):
+        layer=tf.matmul(x,init_weights(net_input,hidden_neuron_num["layer1"]))+init_biases(hidden_neuron_num["layer1"])
+        layer=tf.nn.sigmoid(layer)
+        layers.append(layer)
+    
+    # the hidden layer after first layer of encoder.
+    len_of_layers=len(hidden_neuron_num)
+    # 层次：[2,7].
+    for i in range(2,len_of_layers+1):
+        with tf.name_scope("encoder_layer"+str(i)):
+            W=init_weights(hidden_neuron_num["layer"+str(i-1)],hidden_neuron_num["layer"+str(i)])
+            b=init_biases(hidden_neuron_num["layer"+str(i)])
+            layer=tf.matmul(layers[-1],W)+b
+            layer=tf.nn.sigmoid(layer)
+            layers.append(layer)
+
+    return layers[-1]#返回最后一层会报错.
+
+def decoder(x):
+    '''
+    注意这里：
+    decoder函数开头的layers=[]，layers.append(x)应该与encoder函数里的return layers[-1]搭配。
+    或者decoder函数开头的layers=[]，layers.append(x)改为layers=x,此时应该与encoder函数里的return layers搭配。
+    除此以外的搭配方式都会报错ValueError: Shape must be rank 2 but is rank 1 for 'decoder_layer1_18/MatMul' (op: 'MatMul') with input shapes: [4], [4,8].
+    '''
+    layers=[]
+    layers.append(x)
+
+    len_of_layers=len(hidden_neuron_num)
+
+    # the hidden layer of decoder.
+    # i范围[1,7).
+    for i in range(1,len_of_layers):
+        # decoder_layer范围[1,6].
+        with tf.name_scope("decoder_layer"+str(i)):
+            '''
+            # 从6到1，7-i
+            "layer1":256,
+            "layer2":128,
+            "layer3":64,
+            "layer4":32,
+            "layer5":16,
+            "layer6":8,
+            "layer7":4
+            '''
+            # 7-1=6 => len_of_layers-i=encoder_hidden_layer
+            encoder_hidden_layer=len_of_layers-i
+            W=init_weights(hidden_neuron_num["layer"+str(encoder_hidden_layer+1)],hidden_neuron_num["layer"+str(encoder_hidden_layer)])
+            b=init_biases(hidden_neuron_num["layer"+str(encoder_hidden_layer)])
+            layer=tf.matmul(layers[-1],W)+b
+            layer=tf.nn.sigmoid(layer)
+            layers.append(layer)
+
+    # last layer.
+    with tf.name_scope("decoder_layer"+str(len_of_layers)):
+        W=init_weights(hidden_neuron_num["layer"+str(1)],net_input)
+        b=init_biases(net_input)
+        layer=tf.matmul(layers[-1],W)+b
+        layer=tf.nn.sigmoid(layer)
+        layers.append(layer)
+
+    return layers[-1]
+
+encoder_op=encoder(x)
+decoder_op=decoder(encoder_op)
+
+# loss
+loss=tf.reduce_mean(tf.pow(x-decoder_op,2))
+
+# optimizer
+train_op=tf.train.AdamOptimizer(learning_rate).minimize(loss)
+
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+
+    total_batch=int(mnist.train.num_examples/batch_size)
+
+    for epoch in range(training_epoches):
+        for i in range(total_batch):
+            batch_xs,batch_ys=mnist.train.next_batch(batch_size)
+            _train_op,_loss=sess.run([train_op,loss],feed_dict={x:batch_xs})
+            
+        if epoch%display_step==0:
+            print("epoch [%d]"%epoch," loss:",_loss)            
+
+    print("train end\nnow to visualize\n")
+
+    encoder_decoder=sess.run(decoder_op,feed_dict={x:mnist.test.images[:example_to_show]})
+
+    # compare original images with their reconstructions.
+    f,a=plt.subplots(2,10,figsize=(10,2))
+    for i in range(example_to_show):
+        a[0][i].imshow(np.reshape(mnist.test.images[i],(28,28)))
+        a[1][i].imshow(np.reshape(encoder_decoder[i],(28,28)))
+    plt.show()
 
 # example 23 #########################################################
 
