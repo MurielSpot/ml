@@ -277,6 +277,15 @@ with tf.Session() as sess:
         a[1][i].imshow(np.reshape(encoder_decoder[i],(28,28)))
     plt.show()
 
+'''
+程序运行结果：ml/examples/TensorFlow_22_autoencoder.PNG
+epoch [0]  loss: 0.11168995
+epoch [1]  loss: 0.10286156
+epoch [2]  loss: 0.09679584
+epoch [3]  loss: 0.09334956
+epoch [4]  loss: 0.09041786
+''' 
+
 # example 23 #########################################################
 
 
