@@ -2,7 +2,7 @@
 21:lstm rnn.
 22:自编码器，autoencoder。
 23:name_scope,tf.get_variable,tf.Variable的用法.
-24:
+24:variable_scope,reuse,tf.get_variable.
 25:
 '''
 
@@ -310,6 +310,7 @@ epoch [4]  loss: 0.09041786
 ''' 
 
 # example 23 #########################################################
+# name_scope,tf.get_variable,tf.Variable的用法.
 import tensorflow as tf
 
 with tf.name_scope("a_name_scope"):
@@ -339,7 +340,27 @@ a_name_scope/var2_2:0 [2.2]
 '''
 
 # example 24 #########################################################
+# variable_scope,reuse,tf.get_variable.
+import tensorflow as tf
 
+with tf.variable_scope("a_variable_scope",reuse=True):
+    initializer=tf.constant_initializer(value=3)
+    # 得到var3变量。
+    var3=tf.get_variable(name="var3",shape=[1],dtype=tf.float32,initializer=initializer)
+    # 允许reuse之后，可以重新使用这个var3，即下面这个var3_reuse和上面的var3是同一个变量。
+    var3_reuse=tf.get_variable(name="var3")
+
+    # 下面两句看起来是重用，但实际在TensorFlow里得到了两个不同的变量。
+    var4=tf.Variable(name="var4",initial_value=[4],dtype=tf.float32)
+    var4_reuse=tf.Variable(name="var4",initial_value=[4.1],dtype=tf.float32)
+    
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+
+    print(var3.name,sess.run(var3))
+    print(var3_reuse.name,sess.run(var3_reuse))
+    print(var4.name,sess.run(var4))
+    print(var4_reuse.name,sess.run(var4_reuse))
 
 # example 25 #########################################################
 
