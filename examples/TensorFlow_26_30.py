@@ -1,10 +1,10 @@
 '''
-26:梯度下降可视化。
+26:梯度下降可视化；调参。
 
 '''
 
 # example 26 #########################################################
-# 梯度下降可视化。
+# 梯度下降可视化；调参。
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,6 +12,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 LR=0.1
 REAL_PARAMS=[1.2,2.5]
+# 列举多个参数，每次训练可以选择不同的参数，即调参。
 INIT_PARAMS=[[5,4],
              [5,1],
              [2,4.5]][2]#即[2, 4.5]。
