@@ -110,7 +110,7 @@ print('平均文件词的长度', sum(num_words) / len(num_words))
 #matplotlib.pyplot.show()
 
 # Dimensions for each word vector
-num_dimensions = 300
+num_dimensions = 50
 # 每个文件序列长度人为设定为250.
 max_seq_num=250
 
